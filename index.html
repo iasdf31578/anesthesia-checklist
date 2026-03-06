@@ -16,6 +16,129 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230066cc' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='90' font-family='system-ui' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>">
     
     <style>
+        .edit-mode .checklist-container {
+            display: none;
+        }
+
+        .edit-mode .summary {
+            display: none;
+        }
+
+        .edit-mode .button-group {
+            display: none;
+        }
+
+        .edit-panel {
+            display: none;
+            flex-direction: column;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .edit-mode .edit-panel {
+            display: flex;
+        }
+
+        .edit-item {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .edit-item input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .edit-item-remove {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-weight: 600;
+            min-width: 40px;
+        }
+
+        .edit-item-remove:active {
+            transform: scale(0.95);
+        }
+
+        .add-item-btn {
+            background: #00a856;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .add-item-btn:active {
+            transform: scale(0.98);
+        }
+
+        .edit-controls {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .edit-controls button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .edit-mode-btn {
+            background: #0066cc;
+            color: white;
+        }
+
+        .edit-mode-btn:active {
+            transform: scale(0.98);
+        }
+
+        .save-btn {
+            background: #00a856;
+            color: white;
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
+        }
+
+        .cancel-btn {
+            background: white;
+            color: #666;
+            border: 2px solid #ddd;
+        }
+
+        .cancel-btn:active {
+            transform: scale(0.98);
+        }
+    </style>
+
         * {
             margin: 0;
             padding: 0;
@@ -343,6 +466,10 @@
             <p>檢查清單</p>
         </div>
 
+        <div class="edit-controls" id="editControls">
+            <button class="edit-mode-btn" id="editModeBtn">✏️ 編輯</button>
+        </div>
+
         <div class="button-group">
             <button class="reset-btn" id="resetBtn">🔄 重置</button>
             <div class="progress-bar">
@@ -353,6 +480,11 @@
         </div>
 
         <div class="checklist-container" id="checklistContainer">
+        </div>
+
+        <div class="edit-panel" id="editPanel">
+            <button class="add-item-btn" id="addItemBtn">➕ 新增項目</button>
+            <div id="editItemsContainer"></div>
         </div>
 
         <div class="summary" id="summary">
@@ -369,7 +501,8 @@
             });
         }
 
-        const items = [
+        // 預設項目
+        const DEFAULT_ITEMS = [
             { icon: '👤', label: '確認病人身分' },
             { icon: '📋', label: '手術診斷' },
             { icon: '🔪', label: '手術術式' },
@@ -390,10 +523,36 @@
         const completedCount = document.getElementById('completedCount');
         const totalCount = document.getElementById('totalCount');
         const summary = document.getElementById('summary');
+        const editModeBtn = document.getElementById('editModeBtn');
+        const editPanel = document.getElementById('editPanel');
+        const editItemsContainer = document.getElementById('editItemsContainer');
+        const addItemBtn = document.getElementById('addItemBtn');
+        const container = document.querySelector('.container');
 
+        let items = [];
         let checkedItems = new Set();
+        let isEditMode = false;
 
-        // 從 localStorage 載入已保存的資料
+        // 載入配置
+        function loadConfig() {
+            const saved = localStorage.getItem('checklist-items');
+            if (saved) {
+                try {
+                    items = JSON.parse(saved);
+                } catch (e) {
+                    items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+                }
+            } else {
+                items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+            }
+        }
+
+        // 保存配置
+        function saveConfig() {
+            localStorage.setItem('checklist-items', JSON.stringify(items));
+        }
+
+        // 載入狀態
         function loadState() {
             const saved = localStorage.getItem('checklist-state');
             if (saved) {
@@ -401,11 +560,70 @@
             }
         }
 
-        // 保存狀態到 localStorage
+        // 保存狀態
         function saveState() {
             localStorage.setItem('checklist-state', JSON.stringify(Array.from(checkedItems)));
         }
 
+        // 進入/退出編輯模式
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            container.classList.toggle('edit-mode', isEditMode);
+
+            if (isEditMode) {
+                editModeBtn.textContent = '保存 ✓';
+                editModeBtn.classList.add('save-btn');
+                editModeBtn.classList.remove('edit-mode-btn');
+                renderEditPanel();
+            } else {
+                editModeBtn.textContent = '✏️ 編輯';
+                editModeBtn.classList.add('edit-mode-btn');
+                editModeBtn.classList.remove('save-btn');
+                saveConfig();
+                init();
+            }
+        }
+
+        // 渲染編輯面板
+        function renderEditPanel() {
+            editItemsContainer.innerHTML = '';
+            items.forEach((item, index) => {
+                const editItem = document.createElement('div');
+                editItem.className = 'edit-item';
+                editItem.innerHTML = `
+                    <input type="text" class="icon-input" value="${item.icon}" maxlength="2" placeholder="圖標" style="width: 50px;">
+                    <input type="text" class="label-input" value="${item.label.replace(/\n/g, ' ')}" placeholder="項目名稱">
+                    <button class="edit-item-remove" data-index="${index}">刪除</button>
+                `;
+
+                const removeBtn = editItem.querySelector('.edit-item-remove');
+                removeBtn.addEventListener('click', () => {
+                    items.splice(index, 1);
+                    renderEditPanel();
+                });
+
+                const iconInput = editItem.querySelector('.icon-input');
+                const labelInput = editItem.querySelector('.label-input');
+
+                iconInput.addEventListener('change', (e) => {
+                    items[index].icon = e.target.value || '•';
+                });
+
+                labelInput.addEventListener('change', (e) => {
+                    items[index].label = e.target.value;
+                });
+
+                editItemsContainer.appendChild(editItem);
+            });
+        }
+
+        // 新增項目
+        addItemBtn.addEventListener('click', () => {
+            items.push({ icon: '✓', label: '新項目' });
+            renderEditPanel();
+        });
+
+        // 初始化檢查清單
         function init() {
             checklistContainer.innerHTML = '';
             totalCount.textContent = items.length;
@@ -444,7 +662,7 @@
         function updateProgress() {
             const completed = checkedItems.size;
             const total = items.length;
-            const percentage = Math.round((completed / total) * 100);
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
             completedCount.textContent = completed;
             progressFill.style.width = percentage + '%';
@@ -494,6 +712,8 @@
             }
         }
 
+        editModeBtn.addEventListener('click', toggleEditMode);
+
         resetBtn.addEventListener('click', () => {
             checkedItems.clear();
             document.querySelectorAll('.checklist-item').forEach(item => {
@@ -504,6 +724,7 @@
         });
 
         // 初始化
+        loadConfig();
         loadState();
         init();
     </script>
