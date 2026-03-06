@@ -75,11 +75,53 @@
             opacity: 0.9;
         }
 
+        .button-group {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .reset-btn, .edit-mode-btn {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            flex: 1;
+        }
+
+        .edit-mode-btn {
+            background: #0066cc;
+            color: white;
+        }
+
+        .reset-btn {
+            background: white;
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .reset-btn:active, .edit-mode-btn:active {
+            transform: scale(0.98);
+        }
+
         .progress-bar-container {
             padding: 16px;
             background: #f9f9f9;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            text-align: center;
         }
 
         .progress-bar {
@@ -107,23 +149,16 @@
             font-weight: 600;
         }
 
-        .progress-label {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .button-group {
-            display: flex;
+        .edit-controls {
+            display: none !important;
             gap: 10px;
             padding: 12px 16px;
             background: #f9f9f9;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #ddd;
             flex-shrink: 0;
         }
 
-        .reset-btn, .edit-mode-btn, .save-btn, .cancel-btn {
+        .save-btn, .cancel-btn {
             padding: 12px 16px;
             border-radius: 8px;
             font-size: 14px;
@@ -134,18 +169,18 @@
             flex: 1;
         }
 
-        .edit-mode-btn {
-            background: #0066cc;
+        .save-btn {
+            background: #00a856;
             color: white;
         }
 
-        .reset-btn {
+        .cancel-btn {
             background: white;
-            border: 2px solid #e74c3c;
-            color: #e74c3c;
+            border: 2px solid #ddd;
+            color: #666;
         }
 
-        .reset-btn:active, .edit-mode-btn:active {
+        .save-btn:active, .cancel-btn:active {
             transform: scale(0.98);
         }
 
@@ -249,21 +284,6 @@
             overflow-y: auto;
         }
 
-        .edit-mode .checklist-container,
-        .edit-mode .summary,
-        .edit-mode .reset-btn,
-        .edit-mode .progress-bar-container {
-            display: none;
-        }
-
-        .edit-mode .edit-panel {
-            display: flex;
-        }
-
-        .edit-mode .progress-bar {
-            display: none;
-        }
-
         .add-item-btn {
             background: #00a856;
             color: white;
@@ -275,6 +295,10 @@
             font-size: 14px;
             width: 100%;
             margin-bottom: 12px;
+        }
+
+        .add-item-btn:active {
+            transform: scale(0.98);
         }
 
         .edit-item {
@@ -347,40 +371,33 @@
             min-width: 40px;
         }
 
-        .edit-controls {
-            display: flex;
-            gap: 10px;
-            padding: 12px 16px;
-            background: #f9f9f9;
-            border-bottom: 1px solid #ddd;
-            flex-shrink: 0;
+        .edit-item-remove:active {
+            transform: scale(0.95);
         }
 
-        .save-btn, .cancel-btn {
-            flex: 1;
-        }
-
-        .save-btn {
-            background: #00a856;
-            color: white;
-        }
-
-        .cancel-btn {
-            background: white;
-            border: 2px solid #ddd;
-            color: #666;
-        }
-
-        .edit-mode .edit-controls {
-            display: flex;
-        }
-
+        /* 編輯模式 */
         .edit-mode .button-group {
             display: none;
         }
 
         .edit-mode .progress-bar-container {
             display: none;
+        }
+
+        .edit-mode .checklist-container {
+            display: none;
+        }
+
+        .edit-mode .summary {
+            display: none;
+        }
+
+        .edit-mode .edit-controls {
+            display: flex !important;
+        }
+
+        .edit-mode .edit-panel {
+            display: flex;
         }
     </style>
 </head>
@@ -533,7 +550,6 @@
                     items[index].label = e.target.value;
                 });
 
-                // 拖動事件
                 editItem.addEventListener('dragstart', (e) => {
                     e.dataTransfer.effectAllowed = 'move';
                     e.dataTransfer.setData('text/html', editItem.innerHTML);
