@@ -8,137 +8,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="麻醉評估">
     <meta name="description" content="術前麻醉評估檢查清單">
-    
     <title>術前麻醉評估檢查清單</title>
-    
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230066cc' width='192' height='192'/><text x='50%' y='50%' font-size='100' font-family='system-ui' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230066cc' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='90' font-family='system-ui' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>">
-    
     <style>
-        .edit-mode .checklist-container {
-            display: none;
-        }
-
-        .edit-mode .summary {
-            display: none;
-        }
-
-        .edit-mode .button-group {
-            display: none;
-        }
-
-        .edit-panel {
-            display: none;
-            flex-direction: column;
-            padding: 16px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .edit-mode .edit-panel {
-            display: flex;
-        }
-
-        .edit-item {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 12px;
-            display: flex;
-            gap: 8px;
-            align-items: flex-start;
-        }
-
-        .edit-item input {
-            flex: 1;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 8px 10px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-
-        .edit-item-remove {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 10px;
-            cursor: pointer;
-            font-weight: 600;
-            min-width: 40px;
-        }
-
-        .edit-item-remove:active {
-            transform: scale(0.95);
-        }
-
-        .add-item-btn {
-            background: #00a856;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-
-        .add-item-btn:active {
-            transform: scale(0.98);
-        }
-
-        .edit-controls {
-            display: flex;
-            gap: 10px;
-            padding: 12px 16px;
-            background: #f9f9f9;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .edit-controls button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .edit-mode-btn {
-            background: #0066cc;
-            color: white;
-        }
-
-        .edit-mode-btn:active {
-            transform: scale(0.98);
-        }
-
-        .save-btn {
-            background: #00a856;
-            color: white;
-        }
-
-        .save-btn:active {
-            transform: scale(0.98);
-        }
-
-        .cancel-btn {
-            background: white;
-            color: #666;
-            border: 2px solid #ddd;
-        }
-
-        .cancel-btn:active {
-            transform: scale(0.98);
-        }
-    </style>
-
         * {
             margin: 0;
             padding: 0;
@@ -169,8 +41,6 @@
             color: var(--text-dark);
             -webkit-user-select: none;
             user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-app-region: no-drag;
         }
 
         .container {
@@ -198,13 +68,11 @@
             font-size: 20px;
             font-weight: 700;
             margin-bottom: 4px;
-            letter-spacing: 0.5px;
         }
 
         .header p {
             font-size: 12px;
             opacity: 0.9;
-            font-weight: 400;
         }
 
         .button-group {
@@ -216,27 +84,31 @@
             flex-shrink: 0;
         }
 
-        .reset-btn {
-            flex: 0 0 auto;
+        .reset-btn, .edit-mode-btn, .save-btn, .cancel-btn {
             padding: 10px 14px;
-            background: white;
-            border: 2px solid #e74c3c;
-            color: #e74c3c;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            white-space: nowrap;
+            border: none;
         }
 
-        .reset-btn:active {
-            background: #f8d7da;
+        .edit-mode-btn {
+            background: #0066cc;
+            color: white;
+            flex: 1;
+        }
+
+        .reset-btn {
+            background: white;
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+            flex: 1;
+        }
+
+        .reset-btn:active, .edit-mode-btn:active {
             transform: scale(0.98);
-        }
-
-        .reset-btn:hover {
-            background: #ffe5e5;
         }
 
         .progress-bar {
@@ -245,7 +117,6 @@
             border-radius: 8px;
             height: 10px;
             overflow: hidden;
-            position: relative;
         }
 
         .progress-fill {
@@ -285,29 +156,11 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             padding: 6px;
             text-align: center;
             position: relative;
             overflow: hidden;
-            font-size: 0.85em;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        .checklist-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            transition: left 0.4s ease;
-        }
-
-        .checklist-item:active::before {
-            left: 100%;
         }
 
         .checklist-item:active {
@@ -325,33 +178,10 @@
             box-shadow: 0 4px 12px rgba(0, 168, 86, 0.2);
         }
 
-        .checklist-item.checked .item-icon {
-            animation: checkMark 0.5s ease;
-        }
-
-        @keyframes checkMark {
-            0% {
-                transform: scale(0) rotate(-45deg);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.2) rotate(5deg);
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
-        }
-
         .item-icon {
             font-size: 20px;
             margin-bottom: 3px;
-            transition: all 0.3s ease;
             line-height: 1;
-        }
-
-        .checklist-item.checked .item-icon {
-            color: var(--success-color);
         }
 
         .item-text {
@@ -395,67 +225,108 @@
             font-size: 11px;
             font-weight: 600;
             margin-top: 8px;
-            opacity: 0;
-            animation: slideIn 0.5s ease forwards;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .edit-panel {
+            display: none;
+            flex-direction: column;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
         }
 
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #1a1f71 0%, #3d1f5c 100%);
-            }
+        .edit-mode .checklist-container,
+        .edit-mode .summary,
+        .edit-mode .reset-btn {
+            display: none;
+        }
 
-            .container {
-                background: #1e1e1e;
-                color: white;
-            }
+        .edit-mode .edit-panel {
+            display: flex;
+        }
 
-            .header {
-                background: linear-gradient(135deg, #0066cc 0%, #004a99 100%);
-            }
+        .edit-mode .progress-bar {
+            display: none;
+        }
 
-            .button-group {
-                background: #2a2a2a;
-            }
+        .add-item-btn {
+            background: #00a856;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            width: 100%;
+            margin-bottom: 12px;
+        }
 
-            .reset-btn {
-                background: #2a2a2a;
-                color: #ff6b6b;
-                border-color: #ff6b6b;
-            }
+        .edit-item {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
 
-            .checklist-item {
-                background: #2a2a2a;
-                border-color: #444;
-                color: white;
-            }
+        .edit-item input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
 
-            .checklist-item:hover {
-                border-color: var(--primary-color);
-            }
+        .edit-item-remove {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-weight: 600;
+            min-width: 40px;
+        }
 
-            .item-text {
-                color: white;
-            }
+        .edit-controls {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+            flex-shrink: 0;
+        }
 
-            .summary {
-                background: #2a2a2a;
-                border-top-color: #444;
-            }
+        .save-btn, .cancel-btn {
+            flex: 1;
+        }
 
-            .summary-text {
-                color: #aaa;
-            }
+        .save-btn {
+            background: #00a856;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: white;
+            border: 2px solid #ddd;
+            color: #666;
+        }
+
+        .edit-controls {
+            display: none;
+        }
+
+        .edit-mode .edit-controls {
+            display: flex;
+        }
+
+        .edit-mode .button-group {
+            display: none;
         }
     </style>
 </head>
@@ -466,10 +337,6 @@
             <p>檢查清單</p>
         </div>
 
-        <div class="edit-controls" id="editControls">
-            <button class="edit-mode-btn" id="editModeBtn">✏️ 編輯</button>
-        </div>
-
         <div class="button-group">
             <button class="reset-btn" id="resetBtn">🔄 重置</button>
             <div class="progress-bar">
@@ -477,10 +344,15 @@
                     <span class="progress-text" id="progressText">0%</span>
                 </div>
             </div>
+            <button class="edit-mode-btn" id="editModeBtn">✏️ 編輯</button>
         </div>
 
-        <div class="checklist-container" id="checklistContainer">
+        <div class="edit-controls" id="editControls">
+            <button class="save-btn" id="saveBtn">保存 ✓</button>
+            <button class="cancel-btn" id="cancelBtn">取消</button>
         </div>
+
+        <div class="checklist-container" id="checklistContainer"></div>
 
         <div class="edit-panel" id="editPanel">
             <button class="add-item-btn" id="addItemBtn">➕ 新增項目</button>
@@ -494,26 +366,24 @@
     </div>
 
     <script>
-        // Service Worker 註冊
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(err => {
-                console.log('ServiceWorker 註冊失敗:', err);
+                console.log('ServiceWorker registration failed:', err);
             });
         }
 
-        // 預設項目
         const DEFAULT_ITEMS = [
             { icon: '👤', label: '確認病人身分' },
             { icon: '📋', label: '手術診斷' },
             { icon: '🔪', label: '手術術式' },
             { icon: '📜', label: '過去病史' },
             { icon: '💓', label: '術前生命徵象' },
-            { icon: '🩸', label: '血液檢查\n(CBC, BCS)' },
+            { icon: '🩸', label: '血液檢查(CBC, BCS)' },
             { icon: '🧪', label: '凝血功能檢查' },
             { icon: '🖼️', label: '影像檢查' },
             { icon: '❤️', label: '心臟超音波' },
             { icon: '💨', label: '肺功能檢查' },
-            { icon: '📢', label: '向主治醫師\n報備' },
+            { icon: '📢', label: '向主治醫師報備' },
         ];
 
         const checklistContainer = document.getElementById('checklistContainer');
@@ -524,6 +394,8 @@
         const totalCount = document.getElementById('totalCount');
         const summary = document.getElementById('summary');
         const editModeBtn = document.getElementById('editModeBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
         const editPanel = document.getElementById('editPanel');
         const editItemsContainer = document.getElementById('editItemsContainer');
         const addItemBtn = document.getElementById('addItemBtn');
@@ -533,7 +405,6 @@
         let checkedItems = new Set();
         let isEditMode = false;
 
-        // 載入配置
         function loadConfig() {
             const saved = localStorage.getItem('checklist-items');
             if (saved) {
@@ -547,12 +418,10 @@
             }
         }
 
-        // 保存配置
         function saveConfig() {
             localStorage.setItem('checklist-items', JSON.stringify(items));
         }
 
-        // 載入狀態
         function loadState() {
             const saved = localStorage.getItem('checklist-state');
             if (saved) {
@@ -560,40 +429,30 @@
             }
         }
 
-        // 保存狀態
         function saveState() {
             localStorage.setItem('checklist-state', JSON.stringify(Array.from(checkedItems)));
         }
 
-        // 進入/退出編輯模式
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
+        function toggleEditMode(enter) {
+            isEditMode = enter;
             container.classList.toggle('edit-mode', isEditMode);
 
             if (isEditMode) {
-                editModeBtn.textContent = '保存 ✓';
-                editModeBtn.classList.add('save-btn');
-                editModeBtn.classList.remove('edit-mode-btn');
                 renderEditPanel();
             } else {
-                editModeBtn.textContent = '✏️ 編輯';
-                editModeBtn.classList.add('edit-mode-btn');
-                editModeBtn.classList.remove('save-btn');
-                saveConfig();
                 init();
             }
         }
 
-        // 渲染編輯面板
         function renderEditPanel() {
             editItemsContainer.innerHTML = '';
             items.forEach((item, index) => {
                 const editItem = document.createElement('div');
                 editItem.className = 'edit-item';
                 editItem.innerHTML = `
-                    <input type="text" class="icon-input" value="${item.icon}" maxlength="2" placeholder="圖標" style="width: 50px;">
-                    <input type="text" class="label-input" value="${item.label.replace(/\n/g, ' ')}" placeholder="項目名稱">
-                    <button class="edit-item-remove" data-index="${index}">刪除</button>
+                    <input type="text" class="icon-input" value="${item.icon}" maxlength="2" style="width: 50px;">
+                    <input type="text" class="label-input" value="${item.label}">
+                    <button class="edit-item-remove" data-index="${index}">删除</button>
                 `;
 
                 const removeBtn = editItem.querySelector('.edit-item-remove');
@@ -617,13 +476,11 @@
             });
         }
 
-        // 新增項目
         addItemBtn.addEventListener('click', () => {
             items.push({ icon: '✓', label: '新項目' });
             renderEditPanel();
         });
 
-        // 初始化檢查清單
         function init() {
             checklistContainer.innerHTML = '';
             totalCount.textContent = items.length;
@@ -708,11 +565,23 @@
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.1);
             } catch (e) {
-                // 瀏覽器不支援
+                // Browser doesn't support Web Audio API
             }
         }
 
-        editModeBtn.addEventListener('click', toggleEditMode);
+        editModeBtn.addEventListener('click', () => {
+            toggleEditMode(true);
+        });
+
+        saveBtn.addEventListener('click', () => {
+            saveConfig();
+            toggleEditMode(false);
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            loadConfig();
+            toggleEditMode(false);
+        });
 
         resetBtn.addEventListener('click', () => {
             checkedItems.clear();
@@ -723,7 +592,6 @@
             saveState();
         });
 
-        // 初始化
         loadConfig();
         loadState();
         init();
