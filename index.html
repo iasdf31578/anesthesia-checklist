@@ -179,13 +179,13 @@
         }
 
         .item-icon {
-            font-size: 20px;
+            font-size: 24px;
             margin-bottom: 3px;
             line-height: 1;
         }
 
         .item-text {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 500;
             color: var(--text-dark);
             line-height: 1.2;
@@ -271,6 +271,45 @@
             display: flex;
             gap: 8px;
             align-items: flex-start;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .edit-item:active {
+            cursor: grabbing;
+            background: #e8e8e8;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: scale(1.02);
+        }
+
+        .edit-item.drag-over {
+            background: #e0e7ff;
+            border-color: #0066cc;
+        }
+
+        .drag-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            color: #666;
+            font-size: 16px;
+            flex-shrink: 0;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .edit-item:active .drag-handle {
+            cursor: grabbing;
+            background: #0066cc;
+            color: white;
+            border-color: #0066cc;
         }
 
         .edit-item input {
@@ -449,7 +488,10 @@
             items.forEach((item, index) => {
                 const editItem = document.createElement('div');
                 editItem.className = 'edit-item';
+                editItem.draggable = true;
+                editItem.dataset.index = index;
                 editItem.innerHTML = `
+                    <div class="drag-handle">≡</div>
                     <input type="text" class="icon-input" value="${item.icon}" maxlength="2" style="width: 50px;">
                     <input type="text" class="label-input" value="${item.label}">
                     <button class="edit-item-remove" data-index="${index}">删除</button>
@@ -470,6 +512,45 @@
 
                 labelInput.addEventListener('change', (e) => {
                     items[index].label = e.target.value;
+                });
+
+                // 拖動事件
+                editItem.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', editItem.innerHTML);
+                    editItem.style.opacity = '0.5';
+                });
+
+                editItem.addEventListener('dragend', (e) => {
+                    editItem.style.opacity = '1';
+                    document.querySelectorAll('.edit-item').forEach(item => {
+                        item.classList.remove('drag-over');
+                    });
+                });
+
+                editItem.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    editItem.classList.add('drag-over');
+                });
+
+                editItem.addEventListener('dragleave', (e) => {
+                    editItem.classList.remove('drag-over');
+                });
+
+                editItem.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const draggedIndex = parseInt(document.querySelector('.edit-item[style*="opacity"]')?.dataset.index);
+                    const targetIndex = index;
+
+                    if (draggedIndex !== targetIndex) {
+                        const draggedItem = items[draggedIndex];
+                        items.splice(draggedIndex, 1);
+                        items.splice(targetIndex, 0, draggedItem);
+                        renderEditPanel();
+                    }
+
+                    editItem.classList.remove('drag-over');
                 });
 
                 editItemsContainer.appendChild(editItem);
