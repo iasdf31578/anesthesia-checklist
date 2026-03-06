@@ -1,0 +1,54 @@
+{
+  "name": "術前麻醉評估檢查清單",
+  "short_name": "麻醉評估",
+  "description": "術前麻醉評估應注意的事項檢查清單",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0066cc",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230066cc' width='192' height='192'/><text x='50%' y='50%' font-size='100' font-family='system-ui' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230066cc' width='512' height='512'/><text x='50%' y='50%' font-size='280' font-family='system-ui' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230066cc' width='192' height='192'/><text x='50%' y='50%' font-size='100' font-family='system-ui' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23667eea' width='540' height='720'/><rect fill='white' x='20' y='20' width='500' height='680' rx='20'/><rect fill='%230066cc' x='20' y='20' width='500' height='100' rx='20'/><text x='270' y='70' font-size='32' font-family='system-ui' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>",
+      "sizes": "540x720",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["medical", "productivity"],
+  "shortcuts": [
+    {
+      "name": "開始評估",
+      "short_name": "評估",
+      "description": "開啟術前麻醉評估檢查清單",
+      "url": "/",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230066cc' width='192' height='192' rx='40'/><text x='50%' y='50%' font-size='100' font-family='system-ui' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>✓</text></svg>",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}

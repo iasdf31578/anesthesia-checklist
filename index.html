@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0066cc">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="麻醉評估">
+    <meta name="description" content="術前麻醉評估檢查清單">
+    
+    <title>術前麻醉評估檢查清單</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230066cc' width='192' height='192'/><text x='50%' y='50%' font-size='100' font-family='system-ui' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230066cc' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='90' font-family='system-ui' fill='white' text-anchor='middle' dominant-baseline='central'>🏥</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066cc;
+            --success-color: #00a856;
+            --unchecked-bg: #f5f7fa;
+            --checked-bg: #e8f5e9;
+            --border-color: #ddd;
+            --text-dark: #222;
+            --text-light: #666;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 12px;
+            color: var(--text-dark);
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-app-region: no-drag;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0066cc 0%, #004a99 100%);
+            color: white;
+            padding: 16px 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .reset-btn {
+            flex: 0 0 auto;
+            padding: 10px 14px;
+            background: white;
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .reset-btn:active {
+            background: #f8d7da;
+            transform: scale(0.98);
+        }
+
+        .reset-btn:hover {
+            background: #ffe5e5;
+        }
+
+        .progress-bar {
+            flex: 1;
+            background: #e0e0e0;
+            border-radius: 8px;
+            height: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #00a856, #2ecc71);
+            height: 100%;
+            transition: width 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 3px;
+        }
+
+        .progress-text {
+            font-size: 9px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .checklist-container {
+            padding: 12px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 6px;
+            aspect-ratio: 1;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .checklist-item {
+            aspect-ratio: 1;
+            background: var(--unchecked-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 6px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            font-size: 0.85em;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .checklist-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: left 0.4s ease;
+        }
+
+        .checklist-item:active::before {
+            left: 100%;
+        }
+
+        .checklist-item:active {
+            transform: scale(0.95);
+        }
+
+        .checklist-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .checklist-item.checked {
+            background: var(--checked-bg);
+            border-color: var(--success-color);
+            box-shadow: 0 4px 12px rgba(0, 168, 86, 0.2);
+        }
+
+        .checklist-item.checked .item-icon {
+            animation: checkMark 0.5s ease;
+        }
+
+        @keyframes checkMark {
+            0% {
+                transform: scale(0) rotate(-45deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(5deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .item-icon {
+            font-size: 20px;
+            margin-bottom: 3px;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .checklist-item.checked .item-icon {
+            color: var(--success-color);
+        }
+
+        .item-text {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .checklist-item.checked .item-text {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .summary {
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .summary-text {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .summary-count {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .complete-badge {
+            display: inline-block;
+            background: var(--success-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+            opacity: 0;
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1f71 0%, #3d1f5c 100%);
+            }
+
+            .container {
+                background: #1e1e1e;
+                color: white;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #0066cc 0%, #004a99 100%);
+            }
+
+            .button-group {
+                background: #2a2a2a;
+            }
+
+            .reset-btn {
+                background: #2a2a2a;
+                color: #ff6b6b;
+                border-color: #ff6b6b;
+            }
+
+            .checklist-item {
+                background: #2a2a2a;
+                border-color: #444;
+                color: white;
+            }
+
+            .checklist-item:hover {
+                border-color: var(--primary-color);
+            }
+
+            .item-text {
+                color: white;
+            }
+
+            .summary {
+                background: #2a2a2a;
+                border-top-color: #444;
+            }
+
+            .summary-text {
+                color: #aaa;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 術前麻醉評估</h1>
+            <p>檢查清單</p>
+        </div>
+
+        <div class="button-group">
+            <button class="reset-btn" id="resetBtn">🔄 重置</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="checklist-container" id="checklistContainer">
+        </div>
+
+        <div class="summary" id="summary">
+            <div class="summary-text">完成進度</div>
+            <div class="summary-count"><span id="completedCount">0</span> / <span id="totalCount">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        // Service Worker 註冊
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('ServiceWorker 註冊失敗:', err);
+            });
+        }
+
+        const items = [
+            { icon: '👤', label: '確認病人身分' },
+            { icon: '📋', label: '手術診斷' },
+            { icon: '🔪', label: '手術術式' },
+            { icon: '📜', label: '過去病史' },
+            { icon: '💓', label: '術前生命徵象' },
+            { icon: '🩸', label: '血液檢查\n(CBC, BCS)' },
+            { icon: '🧪', label: '凝血功能檢查' },
+            { icon: '🖼️', label: '影像檢查' },
+            { icon: '❤️', label: '心臟超音波' },
+            { icon: '💨', label: '肺功能檢查' },
+            { icon: '📢', label: '向主治醫師\n報備' },
+        ];
+
+        const checklistContainer = document.getElementById('checklistContainer');
+        const resetBtn = document.getElementById('resetBtn');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const completedCount = document.getElementById('completedCount');
+        const totalCount = document.getElementById('totalCount');
+        const summary = document.getElementById('summary');
+
+        let checkedItems = new Set();
+
+        // 從 localStorage 載入已保存的資料
+        function loadState() {
+            const saved = localStorage.getItem('checklist-state');
+            if (saved) {
+                checkedItems = new Set(JSON.parse(saved));
+            }
+        }
+
+        // 保存狀態到 localStorage
+        function saveState() {
+            localStorage.setItem('checklist-state', JSON.stringify(Array.from(checkedItems)));
+        }
+
+        function init() {
+            checklistContainer.innerHTML = '';
+            totalCount.textContent = items.length;
+
+            items.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'checklist-item';
+                if (checkedItems.has(index)) {
+                    itemElement.classList.add('checked');
+                }
+                itemElement.innerHTML = `
+                    <div class="item-icon">${item.icon}</div>
+                    <div class="item-text">${item.label}</div>
+                `;
+
+                itemElement.addEventListener('click', () => toggleItem(index, itemElement));
+                checklistContainer.appendChild(itemElement);
+            });
+
+            updateProgress();
+        }
+
+        function toggleItem(index, element) {
+            if (checkedItems.has(index)) {
+                checkedItems.delete(index);
+                element.classList.remove('checked');
+            } else {
+                checkedItems.add(index);
+                element.classList.add('checked');
+                playCheckSound();
+            }
+            updateProgress();
+            saveState();
+        }
+
+        function updateProgress() {
+            const completed = checkedItems.size;
+            const total = items.length;
+            const percentage = Math.round((completed / total) * 100);
+
+            completedCount.textContent = completed;
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = percentage + '%';
+
+            if (completed === total && total > 0) {
+                showCompleteMessage();
+            } else {
+                removeCompleteMessage();
+            }
+        }
+
+        function showCompleteMessage() {
+            if (!document.getElementById('completeBadge')) {
+                const badge = document.createElement('div');
+                badge.id = 'completeBadge';
+                badge.className = 'complete-badge';
+                badge.textContent = '✓ 所有項目已完成！';
+                summary.appendChild(badge);
+            }
+        }
+
+        function removeCompleteMessage() {
+            const badge = document.getElementById('completeBadge');
+            if (badge) {
+                badge.remove();
+            }
+        }
+
+        function playCheckSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+
+                oscillator.frequency.value = 800;
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (e) {
+                // 瀏覽器不支援
+            }
+        }
+
+        resetBtn.addEventListener('click', () => {
+            checkedItems.clear();
+            document.querySelectorAll('.checklist-item').forEach(item => {
+                item.classList.remove('checked');
+            });
+            updateProgress();
+            saveState();
+        });
+
+        // 初始化
+        loadState();
+        init();
+    </script>
+</body>
+</html>
